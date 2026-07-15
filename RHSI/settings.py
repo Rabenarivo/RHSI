@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'recrutement_accounts',
+    'recrutement_jobs',
+    'recrutement_interviews',
 ]
 
 MIDDLEWARE = [
@@ -74,8 +77,12 @@ WSGI_APPLICATION = 'RHSI.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'rhsi',
+        'USER': 'postgres',
+        'PASSWORD': 'raja2004',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
