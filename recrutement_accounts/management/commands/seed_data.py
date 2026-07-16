@@ -25,22 +25,35 @@ class Command(BaseCommand):
         offer_alternance, _ = OfferType.objects.get_or_create(contract_type='alternance')
 
         # 3. Create Users
-        password = make_password('raja2004') # or just password123
+        raw_password = 'raja2004'
+        password = make_password(raw_password) # or just password123
         
+        from django.contrib.auth.models import User
+        def sync_django_user(email, is_admin=False):
+            if not User.objects.filter(username=email).exists():
+                user = User.objects.create_user(username=email, email=email, password=raw_password)
+                if is_admin:
+                    user.is_staff = True
+                    user.is_superuser = True
+                    user.save()
+
         admin_acc, _ = Account.objects.get_or_create(
             email='admin@rhsi.com',
             defaults={'account_type': type_admin, 'password': password}
         )
+        sync_django_user('admin@rhsi.com', is_admin=True)
 
         recruteur_acc, _ = Account.objects.get_or_create(
             email='recruteur@rhsi.com',
             defaults={'account_type': type_recruteur, 'password': password}
         )
+        sync_django_user('recruteur@rhsi.com')
 
         candidat_acc, _ = Account.objects.get_or_create(
             email='candidat@rhsi.com',
             defaults={'account_type': type_candidat, 'password': password}
         )
+        sync_django_user('candidat@rhsi.com')
 
         # 4. Create Candidate Profile
         candidat_profile, _ = Candidate.objects.get_or_create(
