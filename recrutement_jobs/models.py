@@ -25,6 +25,7 @@ class JobOffer(models.Model):
         ('1', '1 an'), ('2', '2 ans'), ('3', '3 ans'), ('4', '4 ans'), ('5', '5 ans et plus'),
     ]
     recruteur = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='job_offers', help_text="Référence au recruteur")
+    entreprise = models.CharField(max_length=100, null=True, blank=True, help_text="Entreprise proposant l'offre")
     offer_type = models.ForeignKey(OfferType, on_delete=models.SET_NULL, null=True, related_name='job_offers')
     secteur = models.ForeignKey(Secteur, on_delete=models.SET_NULL, null=True, blank=True, related_name='job_offers')
     niveau = models.CharField(max_length=50, choices=NIVEAU_CHOICES, null=True, blank=True)
@@ -45,6 +46,8 @@ class Application(models.Model):
     job_offer = models.ForeignKey(JobOffer, on_delete=models.CASCADE, related_name='applications')
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, related_name='applications')
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='postulé')
+    cover_letter = models.TextField(null=True, blank=True, help_text="Lettre de motivation")
+    cv_file = models.FileField(upload_to='cvs/', null=True, blank=True, help_text="CV")
     applied_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

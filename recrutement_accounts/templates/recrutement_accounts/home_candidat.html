@@ -2,20 +2,79 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Espace Candidat</title>
+    <title>Espace Candidat - RHSI</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 40px; }
-        .dashboard { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-        h1 { color: #17a2b8; }
-        .logout-btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 4px; }
-        .logout-btn:hover { background-color: #d32f2f; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+        .navbar { background: #0a58ca; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        .navbar h2 { margin: 0; }
+        .logout-btn { padding: 8px 15px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; }
+        .logout-btn:hover { background-color: #c82333; }
+        
+        .container { padding: 40px; max-width: 1200px; margin: 0 auto; }
+        .welcome-card { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; margin-bottom: 40px; border-left: 5px solid #17a2b8; }
+        .welcome-card h1 { color: #17a2b8; margin-top: 0; }
+        
+        h2.section-title { color: #333; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        
+        .jobs-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .job-card { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; border-top: 4px solid #28a745; display: flex; flex-direction: column; }
+        .job-card:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .job-title { font-size: 1.25rem; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .job-entreprise { color: #0056b3; font-weight: 600; margin-bottom: 10px; }
+        .job-type { display: inline-table; padding: 5px 10px; background: #e9ecef; color: #495057; border-radius: 20px; font-size: 0.85rem; margin-bottom: 15px; font-weight: bold; text-align: center; width: fit-content; }
+        .job-desc { color: #666; font-size: 0.95rem; margin-bottom: 15px; line-height: 1.5; flex-grow: 1; }
+        
+        .job-meta { font-size: 0.85rem; color: #888; margin-bottom: 5px; }
+        .job-meta strong { color: #555; }
+        
+        .status-badge { display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-top: 15px; width: fit-content; }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-closed { background: #f8d7da; color: #721c24; }
+        
+        .empty-state { text-align: center; color: #777; padding: 50px; background: #fff; border-radius: 8px; grid-column: 1 / -1; }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <h1>Bienvenue sur l'Espace Candidat</h1>
-        <p>Consultez les offres et suivez vos candidatures.</p>
+    <div class="navbar">
+        <h2>RHSI - Espace Candidat</h2>
         <a href="{% url 'recrutement_accounts:logout' %}" class="logout-btn">Se déconnecter</a>
+    </div>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h1>Bienvenue sur votre tableau de bord !</h1>
+            <p>Retrouvez ici toutes les offres d'emploi disponibles et suivez l'avancement de vos candidatures.</p>
+        </div>
+
+        <h2 class="section-title">Offres d'emploi récemment ajoutées</h2>
+        
+        <div class="jobs-container">
+            {% for job in job_offers %}
+            <div class="job-card">
+                <div class="job-title">{{ job.title }}</div>
+                {% if job.entreprise %}
+                <div class="job-entreprise">
+                    🏢 {{ job.entreprise }}
+                </div>
+                {% endif %}
+                <div class="job-type">{% if job.offer_type %}{{ job.offer_type.contract_type|upper }}{% else %}Non spécifié{% endif %}</div>
+                
+                <p class="job-desc">{{ job.description|truncatewords:20 }}</p>
+                
+                <div class="job-meta"><strong>Secteur :</strong> {% if job.secteur %}{{ job.secteur.name }}{% else %}-{% endif %}</div>
+                <div class="job-meta"><strong>Niveau :</strong> {% if job.niveau %}{{ job.get_niveau_display }}{% else %}-{% endif %}</div>
+                <div class="status-badge {% if job.status == 'active' %}status-active{% else %}status-closed{% endif %}">
+                    {{ job.get_status_display }}
+                </div>
+                <a href="{% url 'recrutement_jobs:application_postuler' job.id %}" class="btn btn-sm btn-primary mt-3" style="width: fit-content;">Postuler</a>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <h3>Aucune offre d'emploi</h3>
+                <p>Il n'y a pas d'offres enregistrées pour le moment. Revenez plus tard !</p>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </body>
 </html>

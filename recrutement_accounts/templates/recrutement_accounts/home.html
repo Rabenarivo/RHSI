@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHSI - Plateforme de Recrutement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
+        .hero { background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); color: white; padding: 100px 0; text-align: center; }
+        .hero h1 { font-size: 3.5rem; font-weight: 700; margin-bottom: 20px; }
+        .hero p { font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9; }
+        .btn-custom { padding: 12px 30px; font-size: 1.1rem; border-radius: 50px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: inline-block; transition: all 0.3s; }
+        .btn-primary-custom { background: white; color: #0d6efd; border: none; }
+        .btn-primary-custom:hover { background: #e9ecef; color: #0a58ca; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-outline-custom { background: transparent; color: white; border: 2px solid white; }
+        .btn-outline-custom:hover { background: rgba(255,255,255,0.1); color: white; transform: translateY(-2px); }
+        .features { padding: 60px 0; }
+        .feature-card { background: white; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s; height: 100%; }
+        .feature-card:hover { transform: translateY(-10px); }
+        .feature-icon { font-size: 3rem; color: #0d6efd; margin-bottom: 20px; }
+        .feature-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 15px; color: #333; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #0a58ca;">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'recrutement_accounts:home' %}">RHSI</a>
+            <div class="ms-auto">
+                <a href="{% url 'recrutement_accounts:login' %}" class="btn btn-outline-light me-2">Connexion</a>
+                <a href="{% url 'recrutement_accounts:register' %}" class="btn btn-light text-primary fw-bold">Inscription</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="container">
+            <h1>Trouvez le talent parfait ou l'emploi de vos rêves</h1>
+            <p>La plateforme de recrutement de nouvelle génération connectant les entreprises aux meilleurs profils.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'recrutement_accounts:register' %}" class="btn-custom btn-primary-custom">Je m'inscris</a>
+                <a href="{% url 'recrutement_accounts:login' %}" class="btn-custom btn-outline-custom">Se connecter</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="features container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-title">Pour les Candidats</div>
+                    <p class="text-muted">Explorez des milliers d'offres d'emploi, postulez en un clic et suivez l'avancement de vos candidatures.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">🏢</div>
+                    <div class="feature-title">Pour les Recruteurs</div>
+                    <p class="text-muted">Publiez vos offres, gérez vos candidatures et trouvez les talents qui feront grandir votre entreprise.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">Simple et Rapide</div>
+                    <p class="text-muted">Une interface intuitive conçue pour vous faire gagner du temps dans votre recherche ou vos recrutements.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

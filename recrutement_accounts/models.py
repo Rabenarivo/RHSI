@@ -10,6 +10,7 @@ class Account(models.Model):
     account_type = models.ForeignKey(AccountType, on_delete=models.CASCADE, related_name='accounts')
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
+    entreprise = models.CharField(max_length=100, null=True, blank=True, help_text="Nom de l'entreprise (pour les recruteurs)")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
