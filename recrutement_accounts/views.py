@@ -5,7 +5,16 @@ from .forms import AccountCreationForm, LoginForm
 from .models import Account
 from django.contrib.auth.models import User
 
+
+def home(request):
+    if request.user.is_authenticated:
+        return redirect('recrutement_accounts:dashboard')
+    return render(request, 'recrutement_accounts/home.html')
+
 def register(request):
+    if request.user.is_authenticated:
+        return redirect('recrutement_accounts:dashboard')
+        
     if request.method == 'POST':
         form = AccountCreationForm(request.POST)
         if form.is_valid():
@@ -32,6 +41,9 @@ def register(request):
     return render(request, 'recrutement_accounts/register.html', {'form': form})
 
 def login(request):
+    if request.user.is_authenticated:
+        return redirect('recrutement_accounts:dashboard')
+        
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -40,26 +52,38 @@ def login(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 auth_login(request, user)
-                try:
-                    account = Account.objects.get(email=email)
-                    account_type = account.account_type.name.lower()
-                except Account.DoesNotExist:
-                    account_type = 'inconnu'
-                
-                if account_type == 'admin':
-                    return render(request, 'recrutement_accounts/home_admin.html')
-                elif account_type == 'recruteur':
-                    return render(request, 'recrutement_accounts/home_recruteur.html')
-                elif account_type == 'candidat':
-                    return render(request, 'recrutement_accounts/home_candidat.html')
-                else:
-                    return redirect('/')
+                return redirect('recrutement_accounts:dashboard')
             else:
                 messages.error(request, 'Email ou mot de passe incorrect.')
     else:
         form = LoginForm()
         
     return render(request, 'recrutement_accounts/login.html', {'form': form})
+
+def dashboard(request):
+    if not request.user.is_authenticated:
+        return redirect('recrutement_accounts:login')
+        
+    try:
+        email_to_check = request.user.email or request.user.username
+        account = Account.objects.get(email=email_to_check)
+        account_type = account.account_type.name.lower()
+    except Account.DoesNotExist:
+        if request.user.is_superuser or request.user.is_staff:
+            account_type = 'admin'
+        else:
+            account_type = 'candidat'
+            
+    if account_type == 'admin':
+        return render(request, 'recrutement_accounts/home_admin.html')
+    elif account_type == 'recruteur':
+        return render(request, 'recrutement_accounts/home_recruteur.html')
+    elif account_type == 'candidat':
+        from recrutement_jobs.models import JobOffer
+        job_offers = JobOffer.objects.filter(status='active').order_by('-id')
+        return render(request, 'recrutement_accounts/home_candidat.html', {'job_offers': job_offers})
+    else:
+        return redirect('/')
 
 def logout(request):
     auth_logout(request)

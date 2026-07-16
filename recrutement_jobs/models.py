@@ -46,6 +46,8 @@ class Application(models.Model):
     job_offer = models.ForeignKey(JobOffer, on_delete=models.CASCADE, related_name='applications')
     candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, related_name='applications')
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='postulé')
+    cover_letter = models.TextField(null=True, blank=True, help_text="Lettre de motivation")
+    cv_file = models.FileField(upload_to='cvs/', null=True, blank=True, help_text="CV")
     applied_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
