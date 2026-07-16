@@ -4,7 +4,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 from recrutement_accounts.models import AccountType, Account, Candidate
-from recrutement_jobs.models import OfferType, JobOffer, Application
+from recrutement_jobs.models import OfferType, JobOffer, Application, Secteur
 from recrutement_interviews.models import Interview, Contract
 
 class Command(BaseCommand):
@@ -18,11 +18,14 @@ class Command(BaseCommand):
         type_recruteur, _ = AccountType.objects.get_or_create(name='recruteur')
         type_candidat, _ = AccountType.objects.get_or_create(name='candidat')
 
-        # 2. Create OfferTypes
+        # 2. Create OfferTypes and Categories
         offer_stage, _ = OfferType.objects.get_or_create(contract_type='stage')
         offer_cdi, _ = OfferType.objects.get_or_create(contract_type='cdi')
         offer_cdd, _ = OfferType.objects.get_or_create(contract_type='cdd')
         offer_alternance, _ = OfferType.objects.get_or_create(contract_type='alternance')
+
+        for s in ['Informatique', 'Gestion', 'Agronomie']:
+            Secteur.objects.get_or_create(name=s)
 
         # 3. Create Users
         raw_password = 'raja2004'
