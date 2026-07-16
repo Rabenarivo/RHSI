@@ -26,3 +26,7 @@ class AccountCreationForm(forms.ModelForm):
             self.add_error('password_confirm', "Les mots de passe ne correspondent pas.")
             
         return cleaned_data
+
+class LoginForm(forms.Form):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}), label="Adresse E-mail")
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label="Mot de passe")
