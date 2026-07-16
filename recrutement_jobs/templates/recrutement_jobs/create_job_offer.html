@@ -31,7 +31,7 @@
             {{ form.as_p }}
             <button type="submit" class="btn">Publier l'offre</button>
         </form>
-        <a href="#" class="back-link">Retour (Le tableau de bord n'a pas d'URL pour le moment)</a>
+        <a href="{% url 'recrutement_jobs:list_job_offer' %}" class="back-link">Voir la liste des offres</a>
     </div>
 </body>
 </html>

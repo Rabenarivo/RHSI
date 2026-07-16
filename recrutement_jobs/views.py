@@ -20,3 +20,7 @@ def create_job_offer(request):
     else:
         form = JobOfferForm()
     return render(request, 'recrutement_jobs/create_job_offer.html', {'form': form})
+
+def list_job_offer(request):
+    job_offers = JobOffer.objects.filter(status="active")
+    return render(request, 'recrutement_jobs/list_job_offer.html', {'job_offers': job_offers})

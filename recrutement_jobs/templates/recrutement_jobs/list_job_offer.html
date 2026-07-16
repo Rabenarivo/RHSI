@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des offres d'emploi</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 40px; margin: 0; }
+        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 30px auto; }
+        h2 { color: #333; margin: 0; }
+        .btn-create { padding: 10px 20px; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold; }
+        .btn-create:hover { background: #0056b3; }
+        
+        .jobs-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
+        .job-card { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.2s; border-top: 4px solid #28a745; display: flex; flex-direction: column; }
+        .job-card:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .job-title { font-size: 1.25rem; font-weight: bold; color: #333; margin-bottom: 10px; }
+        .job-type { display: inline-table; padding: 5px 10px; background: #e9ecef; color: #495057; border-radius: 20px; font-size: 0.85rem; margin-bottom: 15px; font-weight: bold; text-align: center; width: fit-content; }
+        .job-desc { color: #666; font-size: 0.95rem; margin-bottom: 15px; line-height: 1.5; flex-grow: 1; }
+        
+        .job-meta { font-size: 0.85rem; color: #888; margin-bottom: 5px; }
+        .job-meta strong { color: #555; }
+        
+        .status-badge { display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; margin-top: 15px; width: fit-content; }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-closed { background: #f8d7da; color: #721c24; }
+        
+        .back-link { display: block; text-align: center; margin-top: 40px; text-decoration: none; color: #6c757d; }
+        .empty-state { text-align: center; color: #777; padding: 50px; background: #fff; border-radius: 8px; grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Offres d'emploi</h2>
+        <a href="{% url 'recrutement_jobs:create_job_offer' %}" class="btn-create">+ Nouvelle offre</a>
+    </div>
+
+    <div class="jobs-container">
+        {% for job in job_offers %}
+        <div class="job-card">
+            <div class="job-title">{{ job.title }}</div>
+            {% if job.entreprise %}
+            <div style="color: #0056b3; font-weight: 600; margin-bottom: 10px;">
+                🏢 {{ job.entreprise }}
+            </div>
+            {% endif %}
+            <div class="job-type">{% if job.offer_type %}{{ job.offer_type.contract_type|upper }}{% else %}Non spécifié{% endif %}</div>
+            
+            <p class="job-desc">{{ job.description|truncatewords:20 }}</p>
+            
+            <div class="job-meta"><strong>Secteur :</strong> {% if job.secteur %}{{ job.secteur.name }}{% else %}-{% endif %}</div>
+            <div class="job-meta"><strong>Niveau :</strong> {% if job.niveau %}{{ job.get_niveau_display }}{% else %}-{% endif %}</div>
+            <div class="job-meta"><strong>Expérience :</strong> {% if job.experience %}{{ job.get_experience_display }}{% else %}-{% endif %}</div>
+            
+            <div class="status-badge {% if job.status == 'active' %}status-active{% else %}status-closed{% endif %}">
+                {{ job.get_status_display }}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <h3>Aucune offre d'emploi</h3>
+            <p>Il n'y a pas d'offres enregistrées pour le moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <a href="#" class="back-link">Retour</a>
+</body>
+</html>
