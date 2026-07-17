@@ -46,24 +46,3 @@ def calculate_score(cv_skills, job_requirements):
     }
     
     return report
-
-if __name__ == "__main__":
-    # Test basique
-    sample_cv_skills = {
-        'Langages': ['python', 'javascript'],
-        'Frameworks': ['react'],
-        'DevOps': ['git']
-    }
-    
-    sample_job_reqs = [
-        {'skill': 'python', 'weight': 60, 'mandatory': True},
-        {'skill': 'django', 'weight': 20, 'mandatory': False},
-        {'skill': 'git', 'weight': 10, 'mandatory': False},
-        {'skill': 'docker', 'weight': 10, 'mandatory': False}
-    ]
-    
-    result = calculate_score(sample_cv_skills, sample_job_reqs)
-    print("Résultat du scoring :")
-    print(f"Score : {result['score_percentage']}%")
-    print(f"Forces : {', '.join(result['forces'])}")
-    print(f"Manques : {', '.join(result['manques'])}")

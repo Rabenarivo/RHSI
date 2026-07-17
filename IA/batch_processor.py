@@ -84,16 +84,3 @@ def process_directory(input_dir, job_requirements):
         print(f"Fichiers classés dans: {output_dir}")
     else:
         print("Aucun fichier valide trouvé dans le dossier.")
-
-if __name__ == "__main__":
-    # Test basique
-    # Il faudrait créer un dossier "cv_test" avec quelques fichiers pour tester
-    sample_job_reqs = [
-        {'skill': 'python', 'weight': 60, 'mandatory': True},
-        {'skill': 'django', 'weight': 20, 'mandatory': False},
-        {'skill': 'git', 'weight': 10, 'mandatory': False},
-        {'skill': 'docker', 'weight': 10, 'mandatory': False}
-    ]
-    
-    # process_directory("dossier_cv_test", sample_job_reqs)
-    print("Module batch_processor prêt à l'emploi.")

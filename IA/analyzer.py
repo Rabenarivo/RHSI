@@ -38,10 +38,3 @@ def extract_skills(cleaned_text, referentiel):
                     
     # Nettoyer le dictionnaire pour enlever les catégories vides (optionnel)
     return {cat: skills for cat, skills in skills_found.items() if skills}
-
-if __name__ == "__main__":
-    # Test basique
-    ref = load_referentiel()
-    sample_text = "je developpe en js et en python depuis 3 ans. je connais aussi un peu k8s et postgres."
-    print("Texte :", sample_text)
-    print("Compétences trouvées :", extract_skills(sample_text, ref))

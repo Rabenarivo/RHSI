@@ -65,9 +65,3 @@ def extract_and_clean(file_path):
         return ""
     
     return clean_text(text)
-
-if __name__ == "__main__":
-    # Test basique si exécuté directement
-    sample_text = "Développeur FULL-STACK ! J'aime Python, le C++ et le C#. \n\nExpériences: + de 5 ans."
-    print("Texte original :", sample_text)
-    print("Texte nettoyé  :", clean_text(sample_text))
