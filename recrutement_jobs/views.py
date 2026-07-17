@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import JobOfferForm , ApplicationForm
 from .models import JobOffer , Application
+from .utils_pdf import extract_text_from_cv
+from recrutement_accounts.models import Account, Candidate
 
 # Create your views here.
 
@@ -26,7 +28,7 @@ def list_job_offer(request):
     return render(request, 'recrutement_jobs/list_job_offer.html', {'job_offers': job_offers})
 
 def application_postuler(request, job_offer_id):
-    from recrutement_accounts.models import Account, Candidate
+
     job_offer = JobOffer.objects.get(id=job_offer_id)
 
     if request.method == 'POST': 
@@ -50,6 +52,19 @@ def application_postuler(request, job_offer_id):
             application.candidate = candidate
             application.job_offer = job_offer
             application.save()
+            
+            # --- NOUVEAU : EXTRACTION DU TEXTE DU CV ---
+            if application.cv_file:
+                
+                texte_extrait = extract_text_from_cv(application.cv_file.path)
+                application.extracted_cv_text = texte_extrait
+                application.save()
+                
+                # Optionnel : Afficher un message si l'extraction a marché (pour le debug)
+                if not texte_extrait.startswith("Erreur"):
+                    print(f"✅ Texte extrait avec succès pour {candidate.first_name} ({len(texte_extrait)} caractères).")
+            # ---------------------------------------------
+            
             messages.success(request, 'Votre candidature a été envoyée avec succès !')
             return redirect('recrutement_accounts:dashboard')
     else:
