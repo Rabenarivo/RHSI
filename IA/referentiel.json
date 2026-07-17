@@ -1,0 +1,45 @@
+{
+  "Langages": {
+    "python": ["python", "py"],
+    "javascript": ["javascript", "js", "ecmascript"],
+    "java": ["java", "j2ee"],
+    "c#": ["c#", "csharp", "c sharp"],
+    "c++": ["c++", "cpp", "c plus plus"],
+    "php": ["php"],
+    "ruby": ["ruby"],
+    "go": ["go", "golang"],
+    "typescript": ["typescript", "ts"]
+  },
+  "Frameworks": {
+    "react": ["react", "reactjs", "react.js"],
+    "angular": ["angular", "angularjs", "angular.js"],
+    "vue": ["vue", "vuejs", "vue.js"],
+    "django": ["django"],
+    "flask": ["flask"],
+    "spring": ["spring", "springboot", "spring boot"],
+    "node.js": ["node", "nodejs", "node.js"],
+    "express": ["express", "expressjs"]
+  },
+  "Bases de donnees": {
+    "sql": ["sql"],
+    "mysql": ["mysql"],
+    "postgresql": ["postgresql", "postgres", "pg"],
+    "mongodb": ["mongodb", "mongo"],
+    "oracle": ["oracle"],
+    "redis": ["redis"]
+  },
+  "DevOps": {
+    "git": ["git", "github", "gitlab", "bitbucket"],
+    "docker": ["docker", "docker-compose"],
+    "kubernetes": ["kubernetes", "k8s"],
+    "jenkins": ["jenkins"],
+    "aws": ["aws", "amazon web services"],
+    "azure": ["azure", "microsoft azure"],
+    "gcp": ["gcp", "google cloud platform"],
+    "ci/cd": ["ci cd", "ci/cd", "continuous integration", "continuous deployment"]
+  },
+  "OS": {
+    "linux": ["linux", "ubuntu", "debian", "centos"],
+    "windows": ["windows", "win"]
+  }
+}
