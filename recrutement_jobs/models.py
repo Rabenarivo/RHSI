@@ -1,5 +1,6 @@
 from django.db import models
 from recrutement_accounts.models import Account, Candidate
+from django.core.exceptions import ValidationError
 
 class OfferType(models.Model):
     contract_type = models.CharField(max_length=50, help_text="stage, cdi, cdd, alternance")
@@ -36,6 +37,26 @@ class JobOffer(models.Model):
 
     def __str__(self):
         return self.title
+
+class ExperienceRequise(models.Model):
+    job_offer = models.ForeignKey(JobOffer, on_delete=models.CASCADE, related_name='experiences_requises')
+    skill = models.CharField(max_length=100, help_text="ex: JS, JAVA")
+    note = models.PositiveIntegerField(help_text="ex: 10, 20. Le total pour une offre ne doit pas dépasser 100")
+
+    def clean(self):
+        super().clean()
+        if self.job_offer_id:
+            existing_experiences = self.job_offer.experiences_requises.exclude(pk=self.pk)
+            total_note = existing_experiences.aggregate(total=models.Sum('note'))['total'] or 0
+            if total_note + (self.note or 0) > 100:
+                raise ValidationError(f"La somme totale des notes d'expérience ne doit pas dépasser 100. Le total actuel est de {total_note}.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.skill} ({self.note}) pour {self.job_offer}"
 
 class Application(models.Model):
     STATUS_CHOICES = [
