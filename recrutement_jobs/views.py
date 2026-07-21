@@ -2,7 +2,7 @@ from django.shortcuts import render , redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import JobOfferForm , ApplicationForm
-from .models import JobOffer , Application
+from .models import JobOffer , Application, ExperienceRequise
 from .utils_pdf import extract_text_from_cv
 from recrutement_accounts.models import Account, Candidate
 from IA.analyzer import load_referentiel, extract_skills
@@ -21,6 +21,23 @@ def create_job_offer(request):
             account = Account.objects.get(email=request.user.email)
             job_offer.recruteur = account
             job_offer.save()
+            
+            # --- Enregistrement des compétences requises ---
+            skill_names = request.POST.getlist('skill_name')
+            skill_notes = request.POST.getlist('skill_note')
+            
+            for name, note in zip(skill_names, skill_notes):
+                if name.strip() and note.strip():
+                    try:
+                        ExperienceRequise.objects.create(
+                            job_offer=job_offer,
+                            skill=name.strip(),
+                            note=int(note.strip())
+                        )
+                    except Exception as e:
+                        print(f"Erreur lors de l'ajout de la compétence {name}: {e}")
+            # -----------------------------------------------
+            
             messages.success(request, 'Job offer created successfully')
             return redirect('recrutement_jobs:create_job_offer')
     else:
