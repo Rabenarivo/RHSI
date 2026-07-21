@@ -5,6 +5,10 @@ from .forms import JobOfferForm , ApplicationForm
 from .models import JobOffer , Application
 from .utils_pdf import extract_text_from_cv
 from recrutement_accounts.models import Account, Candidate
+from IA.analyzer import load_referentiel, extract_skills
+from IA.scorer import calculate_score
+from IA.extractor import clean_text
+from recrutement_cv.models import AnalyseCV
 
 # Create your views here.
 
@@ -63,6 +67,38 @@ def application_postuler(request, job_offer_id):
                 # Optionnel : Afficher un message si l'extraction a marché (pour le debug)
                 if not texte_extrait.startswith("Erreur"):
                     print(f"✅ Texte extrait avec succès pour {candidate.first_name} ({len(texte_extrait)} caractères).")
+                    
+                    # --- NOUVEAU : ANALYSE IA DU CV ---
+                    # 1. Nettoyer le texte
+                    cleaned_text = clean_text(texte_extrait)
+                    
+                    # 2. Charger le référentiel et extraire les compétences
+                    referentiel = load_referentiel()
+                    found_skills = extract_skills(cleaned_text, referentiel)
+                    
+                    # 3. Récupérer les prérequis de l'offre
+                    job_requirements = []
+                    for exp in job_offer.experiences_requises.all():
+                        job_requirements.append({
+                            'skill': exp.skill,
+                            'weight': exp.note,
+                            'mandatory': False
+                        })
+                    
+                    # 4. Calculer le score
+                    report = calculate_score(found_skills, job_requirements)
+                    
+                    # 5. Enregistrer l'analyse
+                    AnalyseCV.objects.create(
+                        candidat=candidate,
+                        job=job_offer,
+                        application=application,
+                        score=report['score_percentage'],
+                        cv_path=application.cv_file.name,
+                        competence_candidat=found_skills,
+                        forces=report['forces'],
+                        manques=report['manques']
+                    )
             # ---------------------------------------------
             
             messages.success(request, 'Votre candidature a été envoyée avec succès !')
