@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Candidatures Reçues</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #333; text-align: center; margin-bottom: 30px; font-weight: 300; }
+        .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s, box-shadow 0.2s; border-left: 5px solid #007bff; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .info { flex: 2; }
+        .info h3 { margin: 0 0 10px 0; color: #333; font-size: 1.4em; }
+        .info p { margin: 5px 0; color: #555; }
+        
+        .score-container { flex: 1; text-align: center; }
+        .score { font-size: 2.5em; font-weight: bold; color: #28a745; }
+        .score-label { font-size: 0.9em; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .details { flex: 1; text-align: right; }
+        .btn { padding: 8px 15px; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px; font-size: 0.9em; transition: background 0.3s; }
+        .btn:hover { background: #0056b3; }
+        
+        /* IA Badges */
+        .ai-forces { margin-top: 15px; }
+        .ai-forces span { background-color: #e2f0d9; color: #385723; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 5px; display: inline-block; margin-bottom: 5px; }
+        .ai-manques { margin-top: 5px; }
+        .ai-manques span { background-color: #f8d7da; color: #721c24; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 5px; display: inline-block; margin-bottom: 5px; }
+        /* Search Bar */
+        .search-container { margin-bottom: 30px; display: flex; justify-content: center; }
+        .search-container form { display: flex; width: 100%; max-width: 600px; }
+        .search-input { flex: 1; padding: 12px 20px; font-size: 1em; border: 1px solid #ddd; border-radius: 4px 0 0 4px; outline: none; }
+        .search-input:focus { border-color: #007bff; }
+        .search-btn { padding: 12px 25px; background: #343a40; color: #fff; border: none; border-radius: 0 4px 4px 0; cursor: pointer; font-size: 1em; transition: background 0.3s; }
+        .search-btn:hover { background: #23272b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tableau de bord des candidatures</h1>
+        
+        <div class="search-container">
+            <form method="GET" action="{% url 'recrutement_jobs:application_filter' %}">
+                <input type="text" name="q" class="search-input" placeholder="Rechercher un candidat (Nom, Prénom, Email)..." value="{{ search_query }}">
+                <button type="submit" class="search-btn">Rechercher</button>
+            </form>
+        </div>
+        
+        {% if applications %}
+            {% for app in applications %}
+                <div class="card">
+                    <div class="info">
+                        <h3>{{ app.candidate.first_name }} {{ app.candidate.last_name }}</h3>
+                        <p><strong>Offre:</strong> {{ app.job_offer.title }}</p>
+                        <p><strong>Email:</strong> {{ app.candidate.email }}</p>
+                        
+                        {% if app.analyse_cv %}
+                            <div class="ai-forces">
+                                <strong>Points forts:</strong>
+                                {% for force in app.analyse_cv.forces %}
+                                    <span>{{ force|title }}</span>
+                                {% empty %}
+                                    <span style="background: #f8f9fa; color: #6c757d;">Aucun renseigné</span>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="ai-manques">
+                                <strong style="color: #666;">Points faibles:</strong>
+                                {% for manque in app.analyse_cv.manques %}
+                                    <span>{{ manque|title }}</span>
+                                {% empty %}
+                                    <span style="background: #e2f0d9; color: #385723;">Aucun</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="score-container">
+                        {% if app.analyse_cv %}
+                            <div class="score" style="{% if app.analyse_cv.score < 50 %}color: #dc3545;{% elif app.analyse_cv.score < 80 %}color: #fd7e14;{% endif %}">
+                                {{ app.analyse_cv.score|floatformat:0 }}%
+                            </div>
+                            <div class="score-label">Score IA par rapport au compétence requise</div>
+                        {% else %}
+                            <div style="color: #999; font-style: italic; margin-top: 10px;">En attente<br>d'analyse IA</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="details">
+                        <p style="color: #888; font-size: 0.9em; margin-bottom: 15px;">Postulé le {{ app.applied_at|date:"d M Y" }}</p>
+                        <p style="margin-bottom: 15px;">
+                            <span style="background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; color: #495057;">
+                                Statut: {{ app.get_status_display }}
+                            </span>
+                        </p>
+                        {% if app.cv_file %}
+                            <a href="{{ app.cv_file.url }}" class="btn" target="_blank">Voir le CV</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 50px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <h3 style="color: #666; font-weight: normal;">Aucune candidature pour le moment.</h3>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

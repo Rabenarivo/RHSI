@@ -48,6 +48,11 @@ def list_job_offer(request):
     job_offers = JobOffer.objects.filter(status="active")
     return render(request, 'recrutement_jobs/list_job_offer.html', {'job_offers': job_offers})
 
+def get_applictaion_filter(request):
+    # Récupérer les candidatures du candidat actuellement connecté
+    applications = Application.objects.filter(candidate__account__email=request.user.email)
+    return render(request, 'recrutement_jobs/application_filter.html', {'applications' : applications})
+
 def application_postuler(request, job_offer_id):
 
     job_offer = JobOffer.objects.get(id=job_offer_id)
@@ -123,3 +128,7 @@ def application_postuler(request, job_offer_id):
     else:
         form = ApplicationForm()
     return render(request, 'recrutement_jobs/application_postuler.html', {'form': form, 'job_offer': job_offer})
+
+
+
+
