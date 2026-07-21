@@ -1,7 +1,7 @@
 {
   "Langages": {
     "python": ["python", "py"],
-    "javascript": ["javascript", "js", "ecmascript"],
+    "javascript": ["javascript", "js", "ecmascript","TypeScript","JSX","TypeScript","TS","JS"],
     "java": ["java", "j2ee"],
     "c#": ["c#", "csharp", "c sharp"],
     "c++": ["c++", "cpp", "c plus plus"],

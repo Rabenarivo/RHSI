@@ -29,9 +29,37 @@
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn">Publier l'offre</button>
+            
+            <div class="form-group" style="border: 1px solid #ddd; padding: 15px; border-radius: 4px; background-color: #fafafa; margin-top: 15px;">
+                <label style="margin-bottom: 10px; font-size: 1.1em; color: #444;">Compétences requises (Scores IA) - Optionnel</label>
+                <p style="font-size: 0.9em; color: #666; margin-bottom: 15px;">Ajoutez des compétences et leur importance (note sur 100). Le total ne doit pas dépasser 100.</p>
+                <div id="skills-container">
+                    <div class="skill-row" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="text" name="skill_name" placeholder="Compétence (ex: Python)" style="flex: 2;">
+                        <input type="number" name="skill_note" placeholder="Note (ex: 60)" style="flex: 1;" min="1" max="100">
+                    </div>
+                </div>
+                <button type="button" class="btn" style="background-color: #17a2b8; margin-top: 5px; width: auto; padding: 8px 15px;" onclick="addSkillRow()">+ Ajouter une compétence</button>
+            </div>
+
+            <button type="submit" class="btn" style="margin-top: 20px;">Publier l'offre</button>
         </form>
         <a href="{% url 'recrutement_jobs:list_job_offer' %}" class="back-link">Voir la liste des offres</a>
     </div>
+
+    <script>
+        function addSkillRow() {
+            const container = document.getElementById('skills-container');
+            const row = document.createElement('div');
+            row.className = 'skill-row';
+            row.style = 'display: flex; gap: 10px; margin-bottom: 10px;';
+            row.innerHTML = `
+                <input type="text" name="skill_name" placeholder="Compétence (ex: Django)" style="flex: 2;">
+                <input type="number" name="skill_note" placeholder="Note (ex: 40)" style="flex: 1;" min="1" max="100">
+                <button type="button" onclick="this.parentElement.remove()" style="background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; padding: 0 15px; font-weight: bold;">X</button>
+            `;
+            container.appendChild(row);
+        }
+    </script>
 </body>
 </html>
