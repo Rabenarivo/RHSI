@@ -13,3 +13,7 @@ def create_Interview(request,application_id):
         interview = Interview.objects.create(application=application, **data)
         messages.success(request, 'Interview created successfully')
     return render(request, 'recrutement_interviews/create_interview.html', {'application': application})
+
+def list_interview_candidate(request):
+    interviews = Interview.objects.filter(application__candidate__email=request.user.email)
+    return render(request, 'recrutement_interviews/list_interview_candidate.html', {'interviews': interviews})
