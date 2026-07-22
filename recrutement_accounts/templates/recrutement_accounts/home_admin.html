@@ -4,18 +4,45 @@
     <meta charset="UTF-8">
     <title>Espace Administrateur</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 40px; }
-        .dashboard { background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .dashboard { background: #fff; padding: 40px; margin: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
         h1 { color: #dc3545; }
         .logout-btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #f44336; color: white; text-decoration: none; border-radius: 4px; }
         .logout-btn:hover { background-color: #d32f2f; }
     </style>
 </head>
 <body>
+    {% include 'navbar.html' %}
     <div class="dashboard">
         <h1>Bienvenue sur l'Espace Administrateur</h1>
         <p>Gérez les utilisateurs et les paramètres globaux du système.</p>
-        <a href="{% url 'recrutement_accounts:logout' %}" class="logout-btn">Se déconnecter</a>
+        
+        <div style="margin-top: 30px; text-align: left; background: #f9f9f9; padding: 20px; border-radius: 8px;">
+            <h2 style="color: #333; margin-bottom: 15px; font-size: 1.5em; border-bottom: 2px solid #ddd; padding-bottom: 10px;">Actions Récentes</h2>
+            <ul style="list-style-type: none; padding: 0; margin: 0;">
+                {% for entry in recent_actions %}
+                    <li style="padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.95em;">
+                        <span style="font-weight: bold; color: #007bff;">{{ entry.user }}</span> 
+                        {% if entry.action_flag == 1 %}
+                            <span style="color: #28a745; font-weight: bold;">➕ a ajouté</span>
+                        {% elif entry.action_flag == 2 %}
+                            <span style="color: #fd7e14; font-weight: bold;">✏️ a modifié</span>
+                        {% elif entry.action_flag == 3 %}
+                            <span style="color: #dc3545; font-weight: bold;">❌ a supprimé</span>
+                        {% endif %}
+                        <em style="color: #333; margin: 0 5px;">{{ entry.object_repr }}</em>
+                        <span style="color: #666; font-size: 0.85em; background: #e9ecef; padding: 2px 6px; border-radius: 4px;">{{ entry.content_type.name|title }}</span>
+                        <div style="color: #999; font-size: 0.8em; margin-top: 4px;">🕒 {{ entry.action_time|date:"d M Y à H:i" }}</div>
+                    </li>
+                {% empty %}
+                    <li style="color: #777; font-style: italic; padding: 10px 0;">Aucune action récente.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="{% url 'recrutement_accounts:logout' %}" class="logout-btn">Se déconnecter</a>
+        </div>
     </div>
 </body>
 </html>

@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Candidatures Reçues</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
         h1 { color: #333; text-align: center; margin-bottom: 30px; font-weight: 300; }
         .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s, box-shadow 0.2s; border-left: 5px solid #007bff; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
@@ -36,6 +36,7 @@
     </style>
 </head>
 <body>
+    {% include 'navbar.html' %}
     <div class="container">
         <h1>Tableau de bord des candidatures</h1>
         
@@ -89,9 +90,15 @@
                     <div class="details">
                         <p style="color: #888; font-size: 0.9em; margin-bottom: 15px;">Postulé le {{ app.applied_at|date:"d M Y" }}</p>
                         <p style="margin-bottom: 15px;">
-                            <span style="background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; color: #495057;">
-                                Statut: {{ app.get_status_display }}
-                            </span>
+                            <form method="POST" action="{% url 'recrutement_jobs:change_statut_application' app.id %}" style="display: inline-block;">
+                                {% csrf_token %}
+                                <select name="status" style="padding: 4px 8px; border-radius: 4px; font-size: 0.9em; border: 1px solid #ccc;">
+                                    <option value="postulé" {% if app.status == 'postulé' %}selected{% endif %}>Postulé</option>
+                                    <option value="validé_recruteur" {% if app.status == 'validé_recruteur' %}selected{% endif %}>Validé Recruteur</option>
+                                    <option value="refusé" {% if app.status == 'refusé' %}selected{% endif %}>Refusé</option>
+                                </select>
+                                <button type="submit" style="padding: 4px 8px; border-radius: 4px; font-size: 0.9em; background-color: #007bff; color: white; border: none; cursor: pointer;">Changer</button>
+                            </form>
                         </p>
                         {% if app.cv_file %}
                             <a href="{{ app.cv_file.url }}" class="btn" target="_blank">Voir le CV</a>
@@ -105,5 +112,7 @@
             </div>
         {% endif %}
     </div>
+
+
 </body>
 </html>
