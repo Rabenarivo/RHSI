@@ -1,5 +1,7 @@
-from django.shortcuts import render , redirect 
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import JobOfferForm , ApplicationForm
 from .models import JobOffer , Application, ExperienceRequise
@@ -50,8 +52,29 @@ def list_job_offer(request):
 
 def get_applictaion_filter(request):
     # Récupérer les candidatures du candidat actuellement connecté
-    applications = Application.objects.filter(candidate__account__email=request.user.email)
+    applications = Application.objects.filter(job_offer__recruteur__email=request.user.email)
     return render(request, 'recrutement_jobs/application_filter.html', {'applications' : applications})
+
+def change_statut_application(request , application_id):
+    application = get_object_or_404(Application, id=application_id)
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        if new_status:
+            application.status = new_status
+            application.save()
+            
+            # Ajouter aux actions récentes de l'admin
+            LogEntry.objects.log_action(
+                user_id=request.user.id,
+                content_type_id=ContentType.objects.get_for_model(application).pk,
+                object_id=application.id,
+                object_repr=str(application),
+                action_flag=CHANGE,
+                change_message=f"Statut modifié à {application.get_status_display()}"
+            )
+            
+            messages.success(request, 'Statut mis à jour avec succès.')
+    return redirect('recrutement_jobs:application_filter')
 
 def application_postuler(request, job_offer_id):
 
@@ -128,6 +151,9 @@ def application_postuler(request, job_offer_id):
     else:
         form = ApplicationForm()
     return render(request, 'recrutement_jobs/application_postuler.html', {'form': form, 'job_offer': job_offer})
+
+
+
 
 
 
