@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Entretiens</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #333; text-align: center; margin-bottom: 40px; }
+        .card { background: #fff; border-radius: 8px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; border-left: 5px solid #6f42c1; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .card-content h3 { color: #6f42c1; margin-top: 0; margin-bottom: 15px; font-size: 1.4em; }
+        .details p { color: #555; margin: 8px 0; font-size: 1.05em; }
+        .status-badge { display: inline-block; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }
+        .status-planifie { background-color: #cce5ff; color: #004085; }
+        .status-effectue { background-color: #d4edda; color: #155724; }
+        .status-annule { background-color: #f8d7da; color: #721c24; }
+        .empty-state { text-align: center; color: #777; padding: 50px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <div class="container">
+        <h1>Mes Entretiens Planifiés</h1>
+        
+        {% for interview in interviews %}
+        <div class="card">
+            <div class="card-content">
+                <h3>{{ interview.application.job_offer.title }}</h3>
+                <div class="details">
+                    <p><strong>📅 Date de l'entretien :</strong> {{ interview.interview_date|date:"d M Y à H:i" }}</p>
+                    {% if interview.feedback %}
+                        <p><strong>📝 Commentaire du recruteur :</strong> {{ interview.feedback }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div>
+                <span class="status-badge 
+                    {% if interview.status == 'planifié' %}status-planifie
+                    {% elif interview.status == 'effectué' %}status-effectue
+                    {% elif interview.status == 'annulé' %}status-annule
+                    {% endif %}">
+                    {{ interview.get_status_display }}
+                </span>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <h3>Aucun entretien planifié</h3>
+            <p>Si un recruteur valide votre candidature et planifie un entretien, il apparaîtra ici.</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
