@@ -1,0 +1,15 @@
+<nav style="background-color: #343a40; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div style="font-size: 20px; font-weight: bold;">
+        <a href="{% url 'recrutement_accounts:home' %}" style="color: white; text-decoration: none;">Recrutement RH</a>
+    </div>
+    <div style="display: flex; gap: 20px; align-items: center;">
+        <a href="{% url 'recrutement_accounts:dashboard' %}" style="color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='transparent'">Tableau de bord</a>
+        
+        <!-- Liens pratiques -->
+        <a href="{% url 'recrutement_jobs:create_job_offer' %}" style="color: #17a2b8; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='transparent'">+ Créer une offre</a>
+        <a href="{% url 'recrutement_jobs:list_job_offer' %}" style="color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='transparent'">Les offres</a>
+        <a href="{% url 'recrutement_interviews:application_filter' %}" style="color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='transparent'">Planifier Entretien / Candidatures</a>
+        
+        <a href="{% url 'recrutement_accounts:logout' %}" style="color: #ff6b6b; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='transparent'">Déconnexion</a>
+    </div>
+</nav>

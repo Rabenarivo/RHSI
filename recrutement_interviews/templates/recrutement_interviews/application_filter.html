@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Candidatures Validées (Planification)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; }
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #333; text-align: center; margin-bottom: 40px; }
+        .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; border-left: 5px solid #17a2b8; display: flex; justify-content: space-between; align-items: center; }
+        .card-content h3 { color: #17a2b8; margin-top: 0; margin-bottom: 10px; }
+        .details p { color: #555; margin: 5px 0; }
+        .btn { display: inline-block; padding: 10px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; transition: background 0.2s; }
+        .btn:hover { background: #0056b3; }
+        .empty-state { text-align: center; color: #777; padding: 50px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <div class="container">
+        <h1>Candidatures à planifier pour un entretien</h1>
+        
+        {% for app in applications %}
+            <div class="card">
+                <div class="card-content">
+                    <h3>{{ app.candidate.first_name }} {{ app.candidate.last_name }}</h3>
+                    <div class="details">
+                        <p><strong>Offre :</strong> {{ app.job_offer.title }}</p>
+                        <p><strong>Contact :</strong> {{ app.candidate.email }} {% if app.candidate.phone %}| {{ app.candidate.phone }}{% endif %}</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="{% url 'recrutement_interviews:create_interview' app.id %}" class="btn">📅 Planifier un entretien</a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <h3>Aucune candidature en attente d'entretien</h3>
+                <p>Seules les candidatures qui ont le statut "Validé Recruteur" apparaissent ici.</p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
