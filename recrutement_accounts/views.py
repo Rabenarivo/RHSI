@@ -75,6 +75,8 @@ def dashboard(request):
         else:
             account_type = 'candidat'
             
+    request.session['account_type'] = account_type
+            
     if account_type == 'admin':
         recent_actions = LogEntry.objects.all().select_related('content_type', 'user').order_by('-action_time')[:15]
         return render(request, 'recrutement_accounts/home_admin.html', {'recent_actions': recent_actions})
