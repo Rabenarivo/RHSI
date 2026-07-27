@@ -31,7 +31,14 @@
                     </div>
                 </div>
                 <div>
-                    <a href="{% url 'recrutement_interviews:create_interview' app.id %}" class="btn">📅 Planifier un entretien</a>
+                    {% if app.planned_interviews %}
+                        <span class="btn" style="background: #ccc; cursor: not-allowed;" title="Entretien déjà planifié">✅ Déjà planifié</span>
+                        <a href="" class="btn" style="background: #dc3545;">Annuler l'entretien</a>
+                        <a href="{% url 'recrutement_interviews:create_contract' app.id %}" class="btn" style="background: #28a745;">Créer un contrat</a>
+                    {% else %}
+                        <a href="{% url 'recrutement_interviews:create_interview' app.id %}" class="btn">📅 Planifier un entretien</a>
+                        <a href="{% url 'recrutement_interviews:create_contract' app.id %}" class="btn" style="background: #28a745;">Créer un contrat</a>
+                    {% endif %}
                 </div>
             </div>
         {% empty %}

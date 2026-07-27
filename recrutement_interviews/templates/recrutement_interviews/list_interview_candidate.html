@@ -30,9 +30,26 @@
             <div class="card-content">
                 <h3>{{ interview.application.job_offer.title }}</h3>
                 <div class="details">
-                    <p><strong>📅 Date de l'entretien :</strong> {{ interview.interview_date|date:"d M Y à H:i" }}</p>
+                    <p><strong>🔖 Sujet :</strong> {{ interview.title }}</p>
+                    <p><strong>📅 Date de l'entretien :</strong> {{ interview.interview_date|date:"d M Y à H:i" }} ({{ interview.duration_minutes }} minutes)</p>
+                    <p><strong>📌 Format :</strong> {{ interview.get_interview_type_display }}</p>
+                    {% if interview.location %}
+                    <p><strong>📍 Lieu / Lien visio :</strong> {{ interview.location }}</p>
+                    {% endif %}
+                    {% if interview.interviewer %}
+                    <p><strong>👤 Recruteur :</strong> {{ interview.interviewer.entreprise|default:interview.interviewer.email }}</p>
+                    {% endif %}
                     {% if interview.feedback %}
-                        <p><strong>📝 Commentaire du recruteur :</strong> {{ interview.feedback }}</p>
+                        <p><strong>📝 Note :</strong> {{ interview.feedback }}</p>
+                    {% endif %}
+                    
+                    {% if interview.application.contract %}
+                        <div style="margin-top: 15px; padding: 10px; background: #e9ecef; border-radius: 4px; border-left: 4px solid #28a745;">
+                            <p style="margin: 0; color: #333;"><strong>📄 Proposition de Contrat :</strong> {{ interview.application.contract.get_contract_type_display }} (Statut: {{ interview.application.contract.get_status_display }})</p>
+                            {% if interview.application.contract.salary %}
+                            <p style="margin: 5px 0 0 0; color: #555;"><strong>💰 Salaire brut :</strong> {{ interview.application.contract.salary }} €</p>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
             </div>
