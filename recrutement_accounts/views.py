@@ -86,6 +86,8 @@ def dashboard(request):
         from recrutement_jobs.models import JobOffer
         job_offers = JobOffer.objects.filter(status='active').order_by('-id')
         return render(request, 'recrutement_accounts/home_candidat.html', {'job_offers': job_offers})
+    elif account_type in ['employé', 'manager']:
+        return render(request, 'recrutement_accounts/home_employe.html')
     else:
         return redirect('/')
 

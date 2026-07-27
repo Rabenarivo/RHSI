@@ -1,7 +1,7 @@
 from django.db import models
 
 class AccountType(models.Model):
-    name = models.CharField(max_length=50, help_text="admin, recruteur, candidat")
+    name = models.CharField(max_length=50, help_text="admin, recruteur, candidat,employé,manager")
 
     def __str__(self):
         return self.name
