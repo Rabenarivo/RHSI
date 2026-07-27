@@ -2,15 +2,12 @@ from django.shortcuts import render
 from .models import Application,Interview,Contract
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.db.models import Prefetch
 
 def list_application_filter(request):
     applications = Application.objects.filter(
         job_offer__recruteur__email=request.user.email, 
         status="validé_recruteur",
         contract__isnull=True
-    ).prefetch_related(
-        Prefetch('interviews', queryset=Interview.objects.filter(status='planifié'), to_attr='planned_interviews')
     )
     return render(request, 'recrutement_interviews/application_filter.html', {'applications' : applications})
 def create_Interview(request,application_id):
