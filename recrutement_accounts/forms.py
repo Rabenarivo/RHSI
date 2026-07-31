@@ -1,5 +1,20 @@
 from django import forms
-from .models import Account
+from .models import Account, Employee
+
+class AssignManagerForm(forms.Form):
+    employee = forms.ModelChoiceField(
+        queryset=Employee.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-select mb-3'}),
+        label="Sélectionner l'Employé",
+        help_text="L'employé qui sera encadré."
+    )
+    manager = forms.ModelChoiceField(
+        queryset=Employee.objects.filter(account__account_type__name__iexact='manager'),
+        widget=forms.Select(attrs={'class': 'form-select mb-3'}),
+        label="Assigner au Manager",
+        help_text="Le manager qui encadrera cet employé.",
+        required=False
+    )
 
 class AccountCreationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label="Mot de passe")
