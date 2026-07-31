@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .forms import AccountCreationForm, LoginForm
+from .forms import AccountCreationForm, LoginForm, AssignManagerForm
 from .models import Account
 from django.contrib.auth.models import User
 from django.contrib.admin.models import LogEntry
@@ -86,8 +86,10 @@ def dashboard(request):
         from recrutement_jobs.models import JobOffer
         job_offers = JobOffer.objects.filter(status='active').order_by('-id')
         return render(request, 'recrutement_accounts/home_candidat.html', {'job_offers': job_offers})
-    elif account_type in ['employé', 'manager']:
+    elif account_type == 'employé':
         return render(request, 'recrutement_accounts/home_employe.html')
+    elif account_type == 'manager':
+        return render(request, 'recrutement_accounts/home_manager.html')
     else:
         return redirect('/')
 
@@ -95,3 +97,29 @@ def logout(request):
     auth_logout(request)
     messages.success(request, 'Vous avez été déconnecté avec succès.')
     return redirect('recrutement_accounts:login') 
+
+def assign_manager(request):
+    if not request.user.is_authenticated or not (request.user.is_superuser or request.session.get('account_type') == 'admin'):
+        messages.error(request, "Accès refusé.")
+        return redirect('recrutement_accounts:dashboard')
+        
+    if request.method == 'POST':
+        form = AssignManagerForm(request.POST)
+        if form.is_valid():
+            employee = form.cleaned_data['employee']
+            manager = form.cleaned_data['manager']
+            
+            # Save the assignment
+            employee.manager = manager
+            employee.save()
+            
+            if manager:
+                messages.success(request, f"L'employé {employee} a bien été assigné au manager {manager}.")
+            else:
+                messages.success(request, f"Le manager de l'employé {employee} a été retiré.")
+                
+            return redirect('recrutement_accounts:dashboard')
+    else:
+        form = AssignManagerForm()
+        
+    return render(request, 'recrutement_accounts/assign_manager.html', {'form': form})
