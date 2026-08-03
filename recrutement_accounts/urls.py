@@ -12,4 +12,5 @@ urlpatterns = [
     path('assign-manager/', views.assign_manager, name='assign_manager'),
     path('manager-emp/', views.get_manager_emp, name='get_manager_emp'),
     path('demande-conge/', views.create_conges, name='create_conges'),
+    path('leave/<int:leave_id>/<str:status>/', views.change_leave_status, name='change_leave_status'),
 ]

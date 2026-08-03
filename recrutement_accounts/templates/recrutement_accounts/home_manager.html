@@ -57,10 +57,9 @@
                             </td>
                             <td>{{ conge.date_demande|date:"d/m/Y H:i" }}</td>
                             <td>
-                                <!-- On pourra rajouter les boutons valider/refuser ici plus tard -->
                                 {% if conge.statut == 'en_attente' %}
-                                    <button class="btn btn-sm btn-success">Approuver</button>
-                                    <button class="btn btn-sm btn-danger">Refuser</button>
+                                    <a href="{% url 'recrutement_accounts:change_leave_status' conge.id 'approuve' %}" class="btn btn-sm btn-success">Approuver</a>
+                                    <a href="{% url 'recrutement_accounts:change_leave_status' conge.id 'refuse' %}" class="btn btn-sm btn-danger">Refuser</a>
                                 {% endif %}
                             </td>
                         </tr>

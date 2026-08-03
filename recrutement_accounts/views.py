@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import AccountCreationForm, LoginForm, AssignManagerForm, CongesForm
-from .models import Account , Employee , AccountType
+from .models import Account , Employee , AccountType , LeaveRequest
 from django.contrib.auth.models import User
 from django.contrib.admin.models import LogEntry
 from .decorators import admin_required, manager_required, employe_required
@@ -88,9 +88,15 @@ def dashboard(request):
         job_offers = JobOffer.objects.filter(status='active').order_by('-id')
         return render(request, 'recrutement_accounts/home_candidat.html', {'job_offers': job_offers})
     elif account_type == 'employé':
-        return render(request, 'recrutement_accounts/home_employe.html')
+        
+        try:
+            employe = Employee.objects.get(account__email=email_to_check)
+            mes_conges = LeaveRequest.objects.filter(employe=employe).order_by('-date_demande')
+        except Employee.DoesNotExist:
+            employe = None
+            mes_conges = []
+        return render(request, 'recrutement_accounts/home_employe.html', {'employe': employe, 'mes_conges': mes_conges})
     elif account_type == 'manager':
-        from .models import LeaveRequest
         leave_requests = LeaveRequest.objects.filter(employe__manager__account__email=email_to_check).order_by('-date_demande')
         return render(request, 'recrutement_accounts/home_manager.html', {'leave_requests': leave_requests})
     else:
@@ -151,3 +157,38 @@ def create_conges(request):
         form = CongesForm()
         
     return render(request, 'recrutement_accounts/demande_conge.html', {'form': form, 'solde': employe.solde_conges})
+
+@manager_required
+def change_leave_status(request, leave_id, status):
+    from .models import LeaveRequest
+    leave_request = get_object_or_404(LeaveRequest, id=leave_id)
+    
+    # Sécurité : Vérifier que le manager connecté est bien le manager de cet employé
+    if leave_request.employe.manager.account.email != request.user.email and leave_request.employe.manager.account.email != request.user.username:
+        messages.error(request, "Vous n'avez pas l'autorisation de modifier cette demande.")
+        return redirect('recrutement_accounts:dashboard')
+        
+    if status in ['approuve', 'refuse']:
+        # Si on approuve, on déduit le solde de congés (seulement si ce n'est pas déjà approuvé pour éviter la double déduction)
+        if status == 'approuve' and leave_request.statut != 'approuve':
+            # On pourrait rajouter une vérification pour ne déduire que certains types de congés (LeaveType.deductible)
+            # Mais comme on a remplacé LeaveType par un Choice, on va déduire pour tous par défaut sauf "sans_solde"
+            if leave_request.type_conge != 'sans_solde':
+                if leave_request.employe.solde_conges >= leave_request.duree:
+                    leave_request.employe.solde_conges -= leave_request.duree
+                    leave_request.employe.save()
+                else:
+                    messages.error(request, f"L'employé n'a pas assez de jours de congés (Solde: {leave_request.employe.solde_conges}, Requis: {leave_request.duree}).")
+                    return redirect('recrutement_accounts:dashboard')
+                    
+        # Si c'était approuvé et qu'on le passe en refusé/en_attente, on devrait rembourser le solde
+        elif status != 'approuve' and leave_request.statut == 'approuve':
+            if leave_request.type_conge != 'sans_solde':
+                leave_request.employe.solde_conges += leave_request.duree
+                leave_request.employe.save()
+                
+        leave_request.statut = status
+        leave_request.save()
+        messages.success(request, f"Le statut de la demande a été mis à jour ({status}).")
+        
+    return redirect('recrutement_accounts:dashboard')
