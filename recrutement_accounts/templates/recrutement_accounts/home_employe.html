@@ -17,7 +17,60 @@
                 <h5 class="card-title">Vos informations</h5>
                 <p><strong>Email :</strong> {{ request.user.email|default:request.user.username }}</p>
                 <p><strong>Type de compte :</strong> {{ request.session.account_type|title }}</p>
+                {% if employe %}
+                    <p><strong>Manager :</strong> {{ employe.manager|default:"Non assigné" }}</p>
+                    <p>
+                        <strong>Solde de congés :</strong> 
+                        <span class="badge bg-primary fs-6">{{ employe.solde_conges }} jour(s)</span>
+                    </p>
+                {% endif %}
             </div>
+        </div>
+
+        <div class="mt-5 text-start">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Historique de vos congés</h3>
+                <a href="{% url 'recrutement_accounts:create_conges' %}" class="btn btn-primary">Faire une demande</a>
+            </div>
+            
+            {% if mes_conges %}
+                <table class="table table-bordered table-striped">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Type</th>
+                            <th>Du</th>
+                            <th>Au</th>
+                            <th>Durée</th>
+                            <th>Motif</th>
+                            <th>Statut</th>
+                            <th>Demande faite le</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for conge in mes_conges %}
+                        <tr>
+                            <td>{{ conge.get_type_conge_display }}</td>
+                            <td>{{ conge.date_debut }}</td>
+                            <td>{{ conge.date_fin }}</td>
+                            <td>{{ conge.duree }} jour(s)</td>
+                            <td>{{ conge.motif|default:"-" }}</td>
+                            <td>
+                                {% if conge.statut == 'en_attente' %}
+                                    <span class="badge bg-warning text-dark">En attente</span>
+                                {% elif conge.statut == 'approuve' %}
+                                    <span class="badge bg-success">Approuvé</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Refusé</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ conge.date_demande|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-info">Vous n'avez fait aucune demande de congé.</div>
+            {% endif %}
         </div>
     </div>
 </body>
