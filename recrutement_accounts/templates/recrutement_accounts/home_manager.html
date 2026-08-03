@@ -20,6 +20,71 @@
             </div>
         </div>
 
+        <!-- Section Pointage Personnel -->
+        <div class="card mx-auto mt-4 border-info" style="max-width: 500px;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Votre Pointage Quotidien</h5>
+                <p class="mb-3 text-muted">Aujourd'hui : {% now "l d F Y" %}</p>
+                
+                <form action="{% url 'recrutement_payroll:pointage_action' %}" method="post">
+                    {% csrf_token %}
+                    {% if not pointage_jour or not pointage_jour.heure_arrivee %}
+                        <button type="submit" class="btn btn-success btn-lg px-5 shadow">Pointer l'Arrivée</button>
+                    {% elif not pointage_jour.heure_depart %}
+                        <div class="alert alert-success">
+                            Arrivée enregistrée à <strong>{{ pointage_jour.heure_arrivee|time:"H:i" }}</strong>
+                            {% if pointage_jour.retard_minutes > 0 %}
+                                <br><small class="text-danger">(Retard de {{ pointage_jour.retard_minutes }} min)</small>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-danger btn-lg px-5 shadow">Pointer le Départ</button>
+                    {% else %}
+                        <div class="alert alert-secondary">
+                            Journée terminée.<br>
+                            Arrivée : <strong>{{ pointage_jour.heure_arrivee|time:"H:i" }}</strong> | 
+                            Départ : <strong>{{ pointage_jour.heure_depart|time:"H:i" }}</strong>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-lg px-5 disabled" disabled>Pointage Terminé</button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        <!-- Section Présence de l'équipe -->
+        <div class="mt-5 text-start">
+            <h3>Présence de votre équipe aujourd'hui</h3>
+            {% if pointages_equipe %}
+                <table class="table table-bordered table-striped mt-3">
+                    <thead class="table-info">
+                        <tr>
+                            <th>Employé</th>
+                            <th>Heure d'arrivée</th>
+                            <th>Heure de départ</th>
+                            <th>Retard (minutes)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pt in pointages_equipe %}
+                        <tr>
+                            <td>{{ pt.employe.first_name }} {{ pt.employe.last_name }}</td>
+                            <td>{{ pt.heure_arrivee|default:"Non pointé" }}</td>
+                            <td>{{ pt.heure_depart|default:"-" }}</td>
+                            <td>
+                                {% if pt.retard_minutes > 0 %}
+                                    <span class="text-danger fw-bold">{{ pt.retard_minutes }}</span>
+                                {% else %}
+                                    <span class="text-success">0</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-warning mt-3">Aucun membre de votre équipe n'a encore pointé aujourd'hui.</div>
+            {% endif %}
+        </div>
+
         <div class="mt-5 text-start">
             <h3>Demandes de congés de votre équipe</h3>
             {% if leave_requests %}

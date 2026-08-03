@@ -88,17 +88,55 @@ def dashboard(request):
         job_offers = JobOffer.objects.filter(status='active').order_by('-id')
         return render(request, 'recrutement_accounts/home_candidat.html', {'job_offers': job_offers})
     elif account_type == 'employé':
+        from .models import LeaveRequest
+        from recrutement_payroll.models import PointageEmploye
+        from django.utils import timezone
         
         try:
             employe = Employee.objects.get(account__email=email_to_check)
             mes_conges = LeaveRequest.objects.filter(employe=employe).order_by('-date_demande')
+            
+            # Pointage du jour
+            today = timezone.localdate()
+            pointage_jour = PointageEmploye.objects.filter(employe=employe, date=today).first()
+            
         except Employee.DoesNotExist:
             employe = None
             mes_conges = []
-        return render(request, 'recrutement_accounts/home_employe.html', {'employe': employe, 'mes_conges': mes_conges})
+            pointage_jour = None
+            
+        return render(request, 'recrutement_accounts/home_employe.html', {
+            'employe': employe, 
+            'mes_conges': mes_conges,
+            'pointage_jour': pointage_jour
+        })
+        
     elif account_type == 'manager':
+        from .models import LeaveRequest
+        from recrutement_payroll.models import PointageEmploye
+        from django.utils import timezone
+        
+        today = timezone.localdate()
+        
+        try:
+            employe_manager = Employee.objects.get(account__email=email_to_check)
+            pointage_jour = PointageEmploye.objects.filter(employe=employe_manager, date=today).first()
+        except Employee.DoesNotExist:
+            pointage_jour = None
+            
         leave_requests = LeaveRequest.objects.filter(employe__manager__account__email=email_to_check).order_by('-date_demande')
-        return render(request, 'recrutement_accounts/home_manager.html', {'leave_requests': leave_requests})
+        
+        # Pointages de l'équipe pour aujourd'hui
+        pointages_equipe = PointageEmploye.objects.filter(
+            employe__manager__account__email=email_to_check,
+            date=today
+        ).order_by('employe__first_name')
+        
+        return render(request, 'recrutement_accounts/home_manager.html', {
+            'leave_requests': leave_requests,
+            'pointage_jour': pointage_jour,
+            'pointages_equipe': pointages_equipe
+        })
     else:
         return redirect('/')
 
