@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from .forms import AccountCreationForm, LoginForm, AssignManagerForm
+from .forms import AccountCreationForm, LoginForm, AssignManagerForm, CongesForm
 from .models import Account , Employee , AccountType
 from django.contrib.auth.models import User
 from django.contrib.admin.models import LogEntry
@@ -129,3 +129,26 @@ def assign_manager(request):
         
     return render(request, 'recrutement_accounts/assign_manager.html', {'form': form})
 
+
+def create_conges(request):
+    if not request.user.is_authenticated:
+        return redirect('recrutement_accounts:login')
+        
+    try:
+        employe = Employee.objects.get(account__email=request.user.username)
+    except Employee.DoesNotExist:
+        messages.error(request, "Vous n'avez pas de profil employé.")
+        return redirect('recrutement_accounts:dashboard')
+
+    if request.method == 'POST':
+        form = CongesForm(request.POST)
+        if form.is_valid():
+            conge = form.save(commit=False)
+            conge.employe = employe
+            conge.save()
+            messages.success(request, "Votre demande de congé a été soumise avec succès.")
+            return redirect('recrutement_accounts:dashboard')
+    else:
+        form = CongesForm()
+        
+    return render(request, 'recrutement_accounts/demande_conge.html', {'form': form, 'solde': employe.solde_conges})
