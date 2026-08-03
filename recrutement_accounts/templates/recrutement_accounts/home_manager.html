@@ -19,6 +19,58 @@
                 <p><strong>Type de compte :</strong> {{ request.session.account_type|title }}</p>
             </div>
         </div>
+
+        <div class="mt-5 text-start">
+            <h3>Demandes de congés de votre équipe</h3>
+            {% if leave_requests %}
+                <table class="table table-bordered table-striped mt-3">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Employé</th>
+                            <th>Type</th>
+                            <th>Du</th>
+                            <th>Au</th>
+                            <th>Durée</th>
+                            <th>Motif</th>
+                            <th>Statut</th>
+                            <th>Demande faite le</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for conge in leave_requests %}
+                        <tr>
+                            <td>{{ conge.employe.first_name }} {{ conge.employe.last_name }}</td>
+                            <td>{{ conge.get_type_conge_display }}</td>
+                            <td>{{ conge.date_debut }}</td>
+                            <td>{{ conge.date_fin }}</td>
+                            <td>{{ conge.duree }} jour(s)</td>
+                            <td>{{ conge.motif|default:"-" }}</td>
+                            <td>
+                                {% if conge.statut == 'en_attente' %}
+                                    <span class="badge bg-warning text-dark">En attente</span>
+                                {% elif conge.statut == 'approuve' %}
+                                    <span class="badge bg-success">Approuvé</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Refusé</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ conge.date_demande|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <!-- On pourra rajouter les boutons valider/refuser ici plus tard -->
+                                {% if conge.statut == 'en_attente' %}
+                                    <button class="btn btn-sm btn-success">Approuver</button>
+                                    <button class="btn btn-sm btn-danger">Refuser</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-info mt-3">Aucune demande de congé de la part de vos employés.</div>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>

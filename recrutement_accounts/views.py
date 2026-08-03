@@ -89,7 +89,9 @@ def dashboard(request):
     elif account_type == 'employé':
         return render(request, 'recrutement_accounts/home_employe.html')
     elif account_type == 'manager':
-        return render(request, 'recrutement_accounts/home_manager.html')
+        from .models import LeaveRequest
+        leave_requests = LeaveRequest.objects.filter(employe__manager__account__email=email_to_check).order_by('-date_demande')
+        return render(request, 'recrutement_accounts/home_manager.html', {'leave_requests': leave_requests})
     else:
         return redirect('/')
 
