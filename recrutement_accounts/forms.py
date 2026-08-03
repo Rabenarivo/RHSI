@@ -1,5 +1,5 @@
 from django import forms
-from .models import Account, Employee
+from .models import Account, Employee, LeaveRequest
 
 class AssignManagerForm(forms.Form):
     employee = forms.ModelChoiceField(
@@ -52,3 +52,29 @@ class AccountCreationForm(forms.ModelForm):
 class LoginForm(forms.Form):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}), label="Adresse E-mail")
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}), label="Mot de passe")
+
+class CongesForm(forms.ModelForm):
+    class Meta:
+        model = LeaveRequest
+        fields = ['type_conge', 'date_debut', 'date_fin', 'motif']
+        widgets = {
+            'type_conge': forms.Select(attrs={'class': 'form-select'}),
+            'date_debut': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'date_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'motif': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+        }
+        labels = {
+            'type_conge': 'Type de congé',
+            'date_debut': 'Date de début',
+            'date_fin': 'Date de fin',
+            'motif': 'Motif (optionnel)',
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_debut = cleaned_data.get('date_debut')
+        date_fin = cleaned_data.get('date_fin')
+
+        if date_debut and date_fin and date_debut > date_fin:
+            self.add_error('date_fin', "La date de fin ne peut pas être antérieure à la date de début.")
+        return cleaned_data
