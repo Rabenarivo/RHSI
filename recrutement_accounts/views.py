@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .forms import AccountCreationForm, LoginForm, AssignManagerForm
-from .models import Account
+from .models import Account , Employee , AccountType
 from django.contrib.auth.models import User
 from django.contrib.admin.models import LogEntry
 
@@ -98,6 +98,11 @@ def logout(request):
     messages.success(request, 'Vous avez été déconnecté avec succès.')
     return redirect('recrutement_accounts:login') 
 
+def get_manager_emp(request):
+    Employe = Employee.objects.filter(manager__account__email=request.user.username)
+    return render(request, 'recrutement_accounts/get_manager_emp.html', {'Employe': Employe})
+
+
 def assign_manager(request):
     if not request.user.is_authenticated or not (request.user.is_superuser or request.session.get('account_type') == 'admin'):
         messages.error(request, "Accès refusé.")
@@ -123,3 +128,4 @@ def assign_manager(request):
         form = AssignManagerForm()
         
     return render(request, 'recrutement_accounts/assign_manager.html', {'form': form})
+
