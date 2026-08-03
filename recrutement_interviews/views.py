@@ -9,7 +9,9 @@ from recrutement_accounts.models import Account, AccountType
 import unicodedata
 from django.contrib.auth.models import User
 
+from recrutement_accounts.decorators import recruteur_required, candidat_required, admin_required
 
+@recruteur_required
 def list_application_filter(request):
     applications = Application.objects.filter(
         job_offer__recruteur__email=request.user.email, 
@@ -17,6 +19,8 @@ def list_application_filter(request):
         contract__isnull=True
     )
     return render(request, 'recrutement_interviews/application_filter.html', {'applications' : applications})
+
+@recruteur_required
 def create_Interview(request,application_id):
     
     application = Application.objects.get(id=application_id)
@@ -40,10 +44,12 @@ def create_Interview(request,application_id):
         messages.success(request, 'Interview created successfully')
     return render(request, 'recrutement_interviews/create_interview.html', {'application': application})
 
+@candidat_required
 def list_interview_candidate(request):
     interviews = Interview.objects.filter(application__candidate__email=request.user.email)
     return render(request, 'recrutement_interviews/list_interview_candidate.html', {'interviews': interviews})
 
+@recruteur_required
 def create_contrat(request, application_id):
 
     application = Application.objects.get(id=application_id)
@@ -89,11 +95,13 @@ def create_contrat(request, application_id):
     }
     return render(request, 'recrutement_interviews/create_contract.html', context)
 
+@admin_required
 def admin_contract_list(request):
     # For now, just show all contracts for admins
     contracts = Contract.objects.all().order_by('-id')
     return render(request, 'recrutement_interviews/admin_contract_list.html', {'contracts': contracts})
 
+@admin_required
 def admin_contract_detail(request, contract_id):
     
 

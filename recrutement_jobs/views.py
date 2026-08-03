@@ -14,6 +14,9 @@ from recrutement_cv.models import AnalyseCV
 
 # Create your views here.
 
+from recrutement_accounts.decorators import recruteur_required, candidat_required
+
+@recruteur_required
 def create_job_offer(request):
     if request.method == 'POST':
         form = JobOfferForm(request.POST)
@@ -46,15 +49,18 @@ def create_job_offer(request):
         form = JobOfferForm()
     return render(request, 'recrutement_jobs/create_job_offer.html', {'form': form})
 
+@candidat_required
 def list_job_offer(request):
     job_offers = JobOffer.objects.filter(status="active")
     return render(request, 'recrutement_jobs/list_job_offer.html', {'job_offers': job_offers})
 
+@recruteur_required
 def get_applictaion_filter(request):
     # Récupérer les candidatures du candidat actuellement connecté
     applications = Application.objects.filter(job_offer__recruteur__email=request.user.email)
     return render(request, 'recrutement_jobs/application_filter.html', {'applications' : applications})
 
+@recruteur_required
 def change_statut_application(request , application_id):
     application = get_object_or_404(Application, id=application_id)
     if request.method == 'POST':
@@ -76,11 +82,11 @@ def change_statut_application(request , application_id):
             messages.success(request, 'Statut mis à jour avec succès.')
     return redirect('recrutement_jobs:application_filter')
 
+@candidat_required
 def application_postuler(request, job_offer_id):
-
     job_offer = JobOffer.objects.get(id=job_offer_id)
 
-    if request.method == 'POST': 
+    if request.method == 'POST':
         form = ApplicationForm(request.POST, request.FILES)
         if form.is_valid():
             application = form.save(commit=False)

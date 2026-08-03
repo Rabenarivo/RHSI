@@ -5,6 +5,7 @@ from .forms import AccountCreationForm, LoginForm, AssignManagerForm, CongesForm
 from .models import Account , Employee , AccountType
 from django.contrib.auth.models import User
 from django.contrib.admin.models import LogEntry
+from .decorators import admin_required, manager_required, employe_required
 
 
 def home(request):
@@ -100,16 +101,15 @@ def logout(request):
     messages.success(request, 'Vous avez été déconnecté avec succès.')
     return redirect('recrutement_accounts:login') 
 
+
+
+@manager_required
 def get_manager_emp(request):
     Employe = Employee.objects.filter(manager__account__email=request.user.username)
     return render(request, 'recrutement_accounts/get_manager_emp.html', {'Employe': Employe})
 
-
+@admin_required
 def assign_manager(request):
-    if not request.user.is_authenticated or not (request.user.is_superuser or request.session.get('account_type') == 'admin'):
-        messages.error(request, "Accès refusé.")
-        return redirect('recrutement_accounts:dashboard')
-        
     if request.method == 'POST':
         form = AssignManagerForm(request.POST)
         if form.is_valid():
@@ -131,11 +131,8 @@ def assign_manager(request):
         
     return render(request, 'recrutement_accounts/assign_manager.html', {'form': form})
 
-
+@employe_required
 def create_conges(request):
-    if not request.user.is_authenticated:
-        return redirect('recrutement_accounts:login')
-        
     try:
         employe = Employee.objects.get(account__email=request.user.username)
     except Employee.DoesNotExist:
