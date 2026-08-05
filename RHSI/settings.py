@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'recrutement_interviews',
     'recrutement_cv',
     'recrutement_payroll',
+    'recrutement_messages',
 ]
 
 MIDDLEWARE = [

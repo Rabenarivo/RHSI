@@ -14,6 +14,8 @@
             <a href="{% url 'recrutement_interviews:list_interview_candidate' %}" style="color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='transparent'">Mes Entretiens</a>
         {% endif %}
         
+        <a href="{% url 'recrutement_messages:inbox' %}" style="color: #ffc107; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='transparent'">✉️ Messages</a>
+        
         <a href="{% url 'recrutement_accounts:logout' %}" style="color: #ff6b6b; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background 0.2s;" onmouseover="this.style.background='#495057'" onmouseout="this.style.background='transparent'">Déconnexion</a>
     </div>
 </nav>

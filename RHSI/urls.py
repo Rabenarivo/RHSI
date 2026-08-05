@@ -7,4 +7,5 @@ urlpatterns = [
     path('jobs/', include('recrutement_jobs.urls')),
     path('interviews/', include('recrutement_interviews.urls')),
     path('payroll/', include('recrutement_payroll.urls')),
+    path('messages/', include('recrutement_messages.urls')),
 ]

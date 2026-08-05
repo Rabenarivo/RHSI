@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Lecture - {{ msg.subject }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="list-group shadow-sm">
+                    <a href="{% url 'recrutement_messages:compose' %}" class="list-group-item list-group-item-action bg-primary text-white fw-bold text-center">✏️ Nouveau Message</a>
+                    <a href="{% url 'recrutement_messages:inbox' %}" class="list-group-item list-group-item-action">📥 Boîte de réception</a>
+                    <a href="{% url 'recrutement_messages:sent_messages' %}" class="list-group-item list-group-item-action">📤 Messages envoyés</a>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Lecture du message</h3>
+                    <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary">Retour</a>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h4 class="mb-2">{{ msg.subject }}</h4>
+                        <div class="d-flex justify-content-between text-muted">
+                            <div>
+                                <strong>De :</strong> {{ msg.sender.email }}<br>
+                                <strong>À :</strong> {{ msg.recipient.email }}
+                            </div>
+                            <div class="text-end">
+                                <small>{{ msg.sent_at|date:"d M Y à H:i" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4" style="min-height: 200px; white-space: pre-wrap;">{{ msg.body }}</div>
+                    
+                    <div class="card-footer bg-white p-3">
+                        {% if msg.recipient.email == request.user.email or msg.recipient.email == request.user.username %}
+                            <a href="{% url 'recrutement_messages:compose' %}?reply_to={{ msg.id }}" class="btn btn-primary">↩️ Répondre</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
