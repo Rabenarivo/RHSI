@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Fiches de Paie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    {% include 'navbar.html' %}
+    
+    <div class="container mt-5">
+        <h2 class="mb-4">Historique de mes Fiches de Paie</h2>
+
+        <div class="card shadow-sm border-info">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-info">
+                        <tr>
+                            <th>Période</th>
+                            <th>Date d'émission</th>
+                            <th>Salaire Net</th>
+                            <th>Statut</th>
+                            <th>Document</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slip in payrolls %}
+                        <tr>
+                            <td class="align-middle fw-bold">{{ slip.get_mois_display }} {{ slip.annee }}</td>
+                            <td class="align-middle">{{ slip.date_creation|date:"d/m/Y" }}</td>
+                            <td class="align-middle text-success fw-bold">{{ slip.salaire_net }} €</td>
+                            <td class="align-middle">
+                                {% if slip.statut == 'paye' %}
+                                    <span class="badge bg-success">Payé</span>
+                                {% else %}
+                                    <span class="badge bg-primary">Validé</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                <a href="{% url 'recrutement_payroll:payslip_detail' slip.id %}" class="btn btn-sm btn-outline-primary">📄 Consulter / Imprimer</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">Vous n'avez pas encore de fiches de paie disponibles.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'recrutement_accounts:dashboard' %}" class="btn btn-secondary">Retour au Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
