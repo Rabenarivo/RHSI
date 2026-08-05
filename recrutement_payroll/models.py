@@ -83,16 +83,24 @@ class FicheDePaie(models.Model):
 
     def calculate_net(self):
         # 1. Trouver le salaire de base depuis le contrat
-        # Path: Employee -> Account -> Candidate -> Contract
-        # On essaie de récupérer le contrat. S'il y a une erreur on garde le salaire_base actuel.
         try:
-            candidate = self.employe.account.candidate_profile
-            # On prend le dernier contrat en date
-            from recrutement_interviews.models import Contract
-            contrat = Contract.objects.filter(candidate=candidate).order_by('-id').first()
-            if contrat and contrat.salary:
-                self.salaire_base = contrat.salary
+            candidate = None
+            if hasattr(self.employe.account, 'candidate_profile'):
+                candidate = self.employe.account.candidate_profile
+            else:
+                # Recherche par email si l'employé a été créé indépendamment
+                from recrutement_accounts.models import Candidate
+                candidate = Candidate.objects.filter(email=self.employe.account.email).first()
+                if not candidate:
+                    candidate = Candidate.objects.filter(account__email=self.employe.account.email).first()
+                    
+            if candidate:
+                from recrutement_interviews.models import Contract
+                contrat = Contract.objects.filter(candidate=candidate).order_by('-id').first()
+                if contrat and contrat.salary:
+                    self.salaire_base = contrat.salary
         except Exception as e:
+            print("Erreur récupération salaire:", e)
             pass
             
         config = ConfigurationEntreprise.get_config()
