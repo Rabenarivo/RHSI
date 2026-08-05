@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bulletin de Paie - {{ fiche.employe.first_name }} {{ fiche.employe.last_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .payslip-container { max-width: 800px; margin: 40px auto; background: #fff; padding: 40px; border: 1px solid #ddd; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
+        .company-header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .employee-info { border: 1px solid #eee; padding: 15px; background-color: #fdfdfd; border-radius: 5px; margin-bottom: 30px; }
+        .table th, .table td { vertical-align: middle; }
+        .total-row { font-size: 1.2rem; background-color: #e9ecef; }
+        @media print {
+            body { background: #fff; }
+            .payslip-container { box-shadow: none; border: none; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center mt-3 no-print">
+        <button onclick="window.print()" class="btn btn-primary btn-lg">🖨️ Imprimer le bulletin</button>
+        <a href="javascript:history.back()" class="btn btn-secondary btn-lg ms-2">Retour</a>
+    </div>
+
+    <div class="payslip-container">
+        <!-- En-tête Entreprise -->
+        <div class="company-header d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="text-uppercase fw-bold text-primary mb-0">RHSI Solutions</h2>
+                <p class="text-muted mb-0">Système d'Information RH</p>
+                <p class="text-muted mb-0">123 Avenue de l'Innovation, Paris</p>
+            </div>
+            <div class="text-end">
+                <h3 class="text-uppercase text-secondary mb-1">Bulletin de Paie</h3>
+                <p class="fw-bold mb-0">Période : {{ fiche.get_mois_display }} {{ fiche.annee }}</p>
+            </div>
+        </div>
+
+        <!-- Informations Employé -->
+        <div class="employee-info row">
+            <div class="col-md-6">
+                <h5 class="fw-bold">{{ fiche.employe.first_name }} {{ fiche.employe.last_name }}</h5>
+                <p class="mb-1"><strong>Email :</strong> {{ fiche.employe.account.email }}</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <p class="mb-1"><strong>Manager :</strong> {{ fiche.employe.manager|default:"Non assigné" }}</p>
+                <p class="mb-0"><strong>Date d'émission :</strong> {{ fiche.date_creation|date:"d/m/Y" }}</p>
+            </div>
+        </div>
+
+        <!-- Détails de la Paie -->
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Désignation</th>
+                    <th class="text-end">Base / Ajouts (€)</th>
+                    <th class="text-end">Retenues (€)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Salaire de Base -->
+                <tr>
+                    <td>Salaire de base (selon contrat)</td>
+                    <td class="text-end">{{ fiche.salaire_base }}</td>
+                    <td class="text-end"></td>
+                </tr>
+                <!-- Primes -->
+                {% if fiche.prime_fixe > 0 %}
+                <tr>
+                    <td>Prime fixe</td>
+                    <td class="text-end">{{ fiche.prime_fixe }}</td>
+                    <td class="text-end"></td>
+                </tr>
+                {% endif %}
+                {% if fiche.prime_variable > 0 %}
+                <tr>
+                    <td>Prime variable / Performance</td>
+                    <td class="text-end">{{ fiche.prime_variable }}</td>
+                    <td class="text-end"></td>
+                </tr>
+                {% endif %}
+                
+                <!-- Déductions -->
+                {% if fiche.deduction_absences > 0 %}
+                <tr>
+                    <td>Absences non rémunérées (Sans solde)</td>
+                    <td class="text-end"></td>
+                    <td class="text-end text-danger">{{ fiche.deduction_absences }}</td>
+                </tr>
+                {% endif %}
+                {% if fiche.deduction_retards > 0 %}
+                <tr>
+                    <td>Pénalités pour retards cumulés</td>
+                    <td class="text-end"></td>
+                    <td class="text-end text-danger">{{ fiche.deduction_retards }}</td>
+                </tr>
+                {% endif %}
+            </tbody>
+            <tfoot>
+                <tr class="fw-bold">
+                    <td class="text-end">Total</td>
+                    <td class="text-end">{{ fiche.salaire_base|add:fiche.prime_fixe|add:fiche.prime_variable }}</td>
+                    <td class="text-end text-danger">{{ fiche.deduction_absences|add:fiche.deduction_retards }}</td>
+                </tr>
+                <tr class="total-row fw-bold">
+                    <td colspan="2" class="text-end text-uppercase">Net à Payer</td>
+                    <td class="text-end text-success fs-4">{{ fiche.salaire_net }} €</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="mt-5 pt-3 border-top text-center text-muted">
+            <small>Pour vous aider à faire valoir vos droits, conservez ce bulletin de paie sans limitation de durée.<br>Généré automatiquement par le système RHSI.</small>
+        </div>
+    </div>
+</body>
+</html>
